@@ -3,9 +3,20 @@ import jwt from 'jsonwebtoken';
 import prisma from '@/lib/prisma';
 import logger from '@/lib/winston';
 import { config } from '@/config/config';
+import { validationResult } from 'express-validator';
+export { refreshTokenValidation } from '@/utils/validators/authValidators';
 
 export const refresh = async (req: Request, res: Response) => {
     try {
+
+        const error = validationResult(req);
+        if (!error.isEmpty()) {
+            const firstError = error.array()[0];
+            return res.status(400).json({ 
+                code: 'VALIDATION_ERROR',
+                message: firstError.msg
+            });
+        }
         // Sadece refreshToken alanını kontrol et
         const allowedFields = ['refreshToken'];
         const receivedFields = Object.keys(req.body);

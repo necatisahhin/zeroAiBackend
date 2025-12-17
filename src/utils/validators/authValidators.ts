@@ -73,11 +73,20 @@ export const registerValidation = [
 export const loginValidation = [
     checkExtraFields(['email', 'password']),
     body('email')
+        .isString().withMessage('Email must be a string')
         .trim()
         .notEmpty().withMessage('Email is required')
         .isEmail().withMessage('Invalid email format')
         .normalizeEmail(),
     
     body('password')
+        .isString().withMessage('Password must be a string')
         .notEmpty().withMessage('Password is required'),
+];
+
+export const refreshTokenValidation = [
+    checkExtraFields(['refreshToken']),
+    body('refreshToken')
+        .isString().withMessage('Refresh token must be a string')
+        .notEmpty().withMessage('Refresh token is required'),
 ];
