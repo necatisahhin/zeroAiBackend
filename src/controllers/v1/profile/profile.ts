@@ -79,14 +79,7 @@ export const updateProfile = async (req: Request, res: Response) => {
             });
         }
 
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ 
-                code: 'PROFILE_ERROR_01',
-                message: 'Access token is required' 
-            });
-        }
+        const authHeader = req.headers.authorization!!;
 
         const token = authHeader.substring(7);
 
