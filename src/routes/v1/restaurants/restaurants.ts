@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createRestaurant , updateRestaurant, deleteRestaurant } from "@/controllers/v1/restaurants/restaurants";
+import { createRestaurant , updateRestaurant, deleteRestaurant , getRestaurantsByUser } from "@/controllers/v1/restaurants/restaurants";
 import { createRestaurantValidation, updateRestaurantValidation, deleteRestaurantValidation } from "@/utils/validators/restaurantsValidators";
 import { authMiddleware } from "@/middleware/auth";
 
@@ -24,6 +24,12 @@ router.delete(
     authMiddleware,
     deleteRestaurantValidation,
     deleteRestaurant
+);
+
+router.get(
+    "/getRestaurantsByUser",
+    authMiddleware,
+    getRestaurantsByUser
 );
 
 export default router;

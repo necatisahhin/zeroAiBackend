@@ -197,4 +197,49 @@ const deleteRestaurant = async (req: Request, res: Response) => {
     }
 };
 
-export { createRestaurant , updateRestaurant, deleteRestaurant };
+const getRestaurantsByUser = async (req: Request, res: Response) => {
+    try {
+        const authHeader = req.headers.authorization!!;
+
+        const token = authHeader.substring(7);
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, config.jwtSecret) as { userId: string };
+        } catch (err) {
+            return res.status(401).json({ 
+                code: 'PROFILE_ERROR_01',
+                message: 'Invalid access token' 
+            });
+        }
+
+        const userId = decoded.userId;
+
+        const restaurants = await prisma.restaurants.findMany({
+            where: { userId },
+            select: {
+                id: true,
+                name: true,
+                address: true,
+                phoneNumber: true,
+                email: true,
+                createdAt: true,
+                updatedAt: true
+            }
+        });
+
+        return res.status(200).json({
+            code: 'RESTAURANTS_RETRIEVED',
+            message: 'Restaurants retrieved successfully',
+            restaurants
+        });
+    } catch (error) {
+        logger.error('Error retrieving restaurants:', error);
+        return res.status(500).json({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'An error occurred while retrieving the restaurants'
+        });
+    }
+}
+
+export { createRestaurant , updateRestaurant, deleteRestaurant, getRestaurantsByUser };
