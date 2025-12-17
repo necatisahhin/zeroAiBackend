@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  user
+  admin
+  premium
+  elite
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  password String
+  fullname String
+  role Role @default(user)
+  isActive Boolean @default(true) @map("is_active") 
+  socialMediaLinks Json? @map("social_media_links") @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  refreshTokens RefreshToken[]
+  restaurants Restaurants[]
+  staffs Staffs[]
+
+  @@map("Users")
+}
+
+model RefreshToken {
+  id String @id @default(uuid())
+  token String @unique
+  userId String @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("RefreshTokens")
+}
+
+model Staffs {
+  id String @id @default(uuid())
+  userId String @map("user_id")
+  restaurantId String @map("restaurant_id")
+  position String
+  wage Float?
+  hoursWorked Float?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant Restaurants @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@map("Staffs")
+}
+
+model Restaurants {
+  id String @id @default(uuid())
+  userId String @map("user_id")
+  name String
+  address String
+  email String @unique
+  phoneNumber String @map("phone_number") @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  staffs Staffs[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("Restaurants")
+}
